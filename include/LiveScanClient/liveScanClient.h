@@ -56,6 +56,13 @@ private:
 	bool m_bFrameCompression;
 	int m_iCompressionLevel;
 
+	double m_xBoundMin;
+	double m_xBoundMax;
+	double m_yBoundMin;
+	double m_yBoundMax;
+	double m_zBoundMin;
+	double m_zBoundMax;
+
 	FrameFileWriterReader m_framesFileWriterReader;
 
 
@@ -95,5 +102,7 @@ private:
 	void ShowFPS();
 	void ReadIPFromFile();
 	void WriteIPToFile();
+	void ReadBoundsFromFile();
+	void WriteBoundsToFile();
 };
 

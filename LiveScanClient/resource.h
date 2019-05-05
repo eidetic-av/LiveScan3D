@@ -1,5 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
+// Used by LiveScanClient.rc
 //
 #define IDI_APP                         100
 #define IDD_APP                         100
@@ -9,6 +10,12 @@
 #define IDC_IP                          1006
 #define IDC_BUTTON_SWITCH               1013
 #define IDC_STATUS2                     1014
+#define X_BOUND_MIN                     2000
+#define X_BOUND_MAX                     2001
+#define Y_BOUND_MIN                     2002
+#define Y_BOUND_MAX                     2003
+#define Z_BOUND_MIN                     2004
+#define Z_BOUND_MAX                     2005
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

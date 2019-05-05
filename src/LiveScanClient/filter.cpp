@@ -13,6 +13,7 @@
 //        year={2015},
 //    }
 #include "filter.h"
+#include <iostream>
 
 using namespace std;
 
@@ -54,6 +55,48 @@ void filter(std::vector<Point3f> &vertices, std::vector<RGB> &colors, int k, flo
 		if (knn[i].kDistance > distThreshold)
 			indicesToRemove.push_back(i);
 	}
+
+	// new filtering for 
+
+	int lastElemIdx = 0;
+	unsigned int idxToCheck = 0;
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		if (idxToCheck < indicesToRemove.size() && i == indicesToRemove[idxToCheck])
+		{
+			idxToCheck++;
+			continue;
+		}
+		vertices[lastElemIdx] = vertices[i];
+		colors[lastElemIdx] = colors[i];
+
+		lastElemIdx++;
+	}
+
+	vertices.resize(lastElemIdx);
+	colors.resize(lastElemIdx);
+}
+
+
+void bound(std::vector<Point3f> &vertices, std::vector<RGB> &colors, double xBoundMin, double xBoundMax, double yBoundMin, double yBoundMax, double zBoundMin, double zBoundMax)
+{
+	vector<int> indicesToRemove;
+
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		bool remove = false;
+
+		if (vertices[i].X < xBoundMin) remove = true;
+		if (vertices[i].X > xBoundMax) remove = true;
+		if (vertices[i].Y < yBoundMin) remove = true;
+		if (vertices[i].Y > yBoundMax) remove = true;
+		if (vertices[i].Z < zBoundMin) remove = true;
+		if (vertices[i].Z > zBoundMax) remove = true;
+
+		if (remove) indicesToRemove.push_back(i);
+	}
+
+	// remove the indices
 
 	int lastElemIdx = 0;
 	unsigned int idxToCheck = 0;
