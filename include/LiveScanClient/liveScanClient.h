@@ -20,6 +20,7 @@
 #include "calibration.h"
 #include "utils.h"
 #include "KinectCapture.h"
+#include "Freenect2Capture.h"
 #include "frameFileWriterReader.h"
 #include <thread>
 #include <mutex>

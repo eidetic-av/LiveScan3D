@@ -64,7 +64,8 @@ LiveScanClient::LiveScanClient() :
 	m_nFilterNeighbors(10),
 	m_fFilterThreshold(0.01f)
 {
-	pCapture = new KinectCapture();
+	//pCapture = new KinectCapture();
+	pCapture = new Freenect2Capture();
 
 	LARGE_INTEGER qpf = { 0 };
 	if (QueryPerformanceFrequency(&qpf))
