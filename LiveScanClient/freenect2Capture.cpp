@@ -12,69 +12,77 @@
 //        title={LiveScan3D: A Fast and Inexpensive 3D Data Acquisition System for Multiple Kinect v2 Sensors},
 //        year={2015},
 //    }
+
 #include "Freenect2Capture.h"
-#include <chrono>
+
+#include <iostream>
+
 #include <libfreenect2/libfreenect2.hpp>
+#include <libfreenect2/packet_pipeline.h>
+#include <libfreenect2/frame_listener_impl.h>
+#include <libfreenect2/registration.h>
+
+using namespace std;
+using namespace libfreenect2;
+
+Freenect2 freenect2;
+Freenect2Device* dev = 0;
+Registration* registration;
+Frame undistorted(512, 424, 4), registered(512, 424, 4);
+
+SyncMultiFrameListener listener(Frame::Color | Frame::Ir | Frame::Depth);
 
 Freenect2Capture::Freenect2Capture()
 {
-	pKinectSensor = NULL;
-	pCoordinateMapper = NULL;
-	pMultiSourceFrameReader = NULL;
 }
 
 Freenect2Capture::~Freenect2Capture()
 {
-	SafeRelease(pKinectSensor);
-	SafeRelease(pCoordinateMapper);
-	SafeRelease(pMultiSourceFrameReader);
+	if (dev != 0)
+	{
+		dev->stop();
+		dev->close();
+		delete registration;
+	}
 }
 
 bool Freenect2Capture::Initialize()
 {
-	HRESULT hr;
+	//PacketPipeline* pipeline = new CudaPacketPipeline(-1);
+	PacketPipeline* pipeline = new CpuPacketPipeline();
 
-	hr = GetDefaultKinectSensor(&pKinectSensor);
-	if (FAILED(hr))
+	string serial = freenect2.getDefaultDeviceSerialNumber();
+
+	dev = freenect2.openDevice(serial, pipeline);
+
+	if (dev == 0)
 	{
+		cout << "Failed to open Freenect2 device" << endl;
+		return false;
+	}
+	else cout << "Opened Freenect2 device" << endl;
+
+	dev->setColorFrameListener(&listener);
+	dev->setIrAndDepthFrameListener(&listener);
+
+	if (!dev->start())
+	{
+		cout << "Failed to start Freenect2 frame capture" << endl;
 		bInitialized = false;
-		return bInitialized;
+	}
+	else {
+		cout << "Started Freenect2 frame capture" << endl;
+		bInitialized = true;
 	}
 
-	if (pKinectSensor)
+	registration = new Registration(dev->getIrCameraParams(), dev->getColorCameraParams());
+
+	// acquire an initial frame to make sure its all working?
+	bool bTemp;
+	do
 	{
-		pKinectSensor->get_CoordinateMapper(&pCoordinateMapper);
-		hr = pKinectSensor->Open();
-
-		if (SUCCEEDED(hr))
-		{
-			pKinectSensor->OpenMultiSourceFrameReader(FrameSourceTypes::FrameSourceTypes_Color |
-				FrameSourceTypes::FrameSourceTypes_Depth |
-				FrameSourceTypes::FrameSourceTypes_Body |
-				FrameSourceTypes::FrameSourceTypes_BodyIndex,
-				&pMultiSourceFrameReader);
-		}
-	}
-
-	bInitialized = SUCCEEDED(hr);
-
-	if (bInitialized)
-	{
-		std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
-		bool bTemp;
-		do
-		{
-			bTemp = AcquireFrame();
-
-			std::chrono::duration<double> elapsedSeconds = std::chrono::system_clock::now() - start;
-			if (elapsedSeconds.count() > 5.0)
-			{
-				bInitialized = false;
-				break;
-			}
-
-		} while (!bTemp);
-	}
+		bTemp = AcquireFrame();
+	} while (!bTemp);
 
 	return bInitialized;
 }
@@ -86,166 +94,44 @@ bool Freenect2Capture::AcquireFrame()
 		return false;
 	}
 
-	//Multi frame
-	IMultiSourceFrame* pMultiFrame = NULL;
-	HRESULT hr = pMultiSourceFrameReader->AcquireLatestFrame(&pMultiFrame);
-
-	if (!SUCCEEDED(hr))
+	FrameMap frames;
+	if (!listener.waitForNewFrame(frames, 10000))
 	{
+		cout << "Frame acquisition timed out..." << endl;
 		return false;
 	}
 
-	GetDepthFrame(pMultiFrame);
-	GetColorFrame(pMultiFrame);
-	GetBodyFrame(pMultiFrame);
-	GetBodyIndexFrame(pMultiFrame);
+	Frame* rgb = frames[Frame::Color];
+	Frame* ir = frames[Frame::Ir];
+	Frame* depth = frames[Frame::Depth];
 
-	SafeRelease(pMultiFrame);
+	registration->apply(rgb, depth, &undistorted, &registered);
+
+	if (pDepth == NULL) pDepth = new UINT16[512 * 424];
+	if (pColorRGBX == NULL) pColorRGBX = new RGB[rgb->width * rgb->height];
+
+	memcpy(pColorRGBX, rgb->data, rgb->width * rgb->height * sizeof(RGB));
+	memcpy(pDepth, depth->data, 512 * 424 * sizeof(UINT16));
+
+	//cout << (int)pColorRGBX[0].rgbRed << endl;
+
+	listener.release(frames);
 
 	return true;
 }
 
 void Freenect2Capture::MapDepthFrameToCameraSpace(Point3f* pCameraSpacePoints)
 {
-	pCoordinateMapper->MapDepthFrameToCameraSpace(nDepthFrameWidth * nDepthFrameHeight, pDepth, nDepthFrameWidth * nDepthFrameHeight, (CameraSpacePoint*)pCameraSpacePoints);
 }
 
 void Freenect2Capture::MapColorFrameToCameraSpace(Point3f* pCameraSpacePoints)
 {
-	pCoordinateMapper->MapColorFrameToCameraSpace(nDepthFrameWidth * nDepthFrameHeight, pDepth, nColorFrameWidth * nColorFrameHeight, (CameraSpacePoint*)pCameraSpacePoints);
 }
 
 void Freenect2Capture::MapDepthFrameToColorSpace(Point2f* pColorSpacePoints)
 {
-	pCoordinateMapper->MapDepthFrameToColorSpace(nDepthFrameWidth * nDepthFrameHeight, pDepth, nDepthFrameWidth * nDepthFrameHeight, (ColorSpacePoint*)pColorSpacePoints);
 }
 
 void Freenect2Capture::MapColorFrameToDepthSpace(Point2f* pDepthSpacePoints)
 {
-	pCoordinateMapper->MapColorFrameToDepthSpace(nDepthFrameWidth * nDepthFrameHeight, pDepth, nColorFrameWidth * nColorFrameHeight, (DepthSpacePoint*)pDepthSpacePoints);;
-}
-
-void Freenect2Capture::GetDepthFrame(IMultiSourceFrame* pMultiFrame)
-{
-	IDepthFrameReference* pDepthFrameReference = NULL;
-	IDepthFrame* pDepthFrame = NULL;
-	pMultiFrame->get_DepthFrameReference(&pDepthFrameReference);
-	HRESULT hr = pDepthFrameReference->AcquireFrame(&pDepthFrame);
-
-	if (SUCCEEDED(hr))
-	{
-		if (pDepth == NULL)
-		{
-			IFrameDescription* pFrameDescription = NULL;
-			hr = pDepthFrame->get_FrameDescription(&pFrameDescription);
-			pFrameDescription->get_Width(&nDepthFrameWidth);
-			pFrameDescription->get_Height(&nDepthFrameHeight);
-			pDepth = new UINT16[nDepthFrameHeight * nDepthFrameWidth];
-			SafeRelease(pFrameDescription);
-		}
-
-		UINT nBufferSize = nDepthFrameHeight * nDepthFrameWidth;
-		hr = pDepthFrame->CopyFrameDataToArray(nBufferSize, pDepth);
-	}
-
-	SafeRelease(pDepthFrame);
-	SafeRelease(pDepthFrameReference);
-}
-
-void Freenect2Capture::GetColorFrame(IMultiSourceFrame* pMultiFrame)
-{
-	IColorFrameReference* pColorFrameReference = NULL;
-	IColorFrame* pColorFrame = NULL;
-	pMultiFrame->get_ColorFrameReference(&pColorFrameReference);
-	HRESULT hr = pColorFrameReference->AcquireFrame(&pColorFrame);
-
-	if (SUCCEEDED(hr))
-	{
-		if (pColorRGBX == NULL)
-		{
-			IFrameDescription* pFrameDescription = NULL;
-			hr = pColorFrame->get_FrameDescription(&pFrameDescription);
-			hr = pFrameDescription->get_Width(&nColorFrameWidth);
-			hr = pFrameDescription->get_Height(&nColorFrameHeight);
-			pColorRGBX = new RGB[nColorFrameWidth * nColorFrameHeight];
-			SafeRelease(pFrameDescription);
-		}
-
-		UINT nBufferSize = nColorFrameWidth * nColorFrameHeight * sizeof(RGB);
-		hr = pColorFrame->CopyConvertedFrameDataToArray(nBufferSize, reinterpret_cast<BYTE*>(pColorRGBX), ColorImageFormat_Bgra);
-	}
-
-	SafeRelease(pColorFrame);
-	SafeRelease(pColorFrameReference);
-}
-
-void Freenect2Capture::GetBodyFrame(IMultiSourceFrame* pMultiFrame)
-{
-	IBodyFrameReference* pBodyFrameReference = NULL;
-	IBodyFrame* pBodyFrame = NULL;
-	pMultiFrame->get_BodyFrameReference(&pBodyFrameReference);
-	HRESULT hr = pBodyFrameReference->AcquireFrame(&pBodyFrame);
-
-
-	if (SUCCEEDED(hr))
-	{
-		IBody* bodies[BODY_COUNT] = { NULL };
-		pBodyFrame->GetAndRefreshBodyData(BODY_COUNT, bodies);
-
-		vBodies = std::vector<Body>(BODY_COUNT);
-		for (int i = 0; i < BODY_COUNT; i++)
-		{
-			if (bodies[i])
-			{
-				Joint joints[JointType_Count];
-				BOOLEAN isTracked;
-
-				bodies[i]->get_IsTracked(&isTracked);
-				bodies[i]->GetJoints(JointType_Count, joints);
-
-				vBodies[i].vJoints.assign(joints, joints + JointType_Count);
-
-				if (isTracked == TRUE)
-					vBodies[i].bTracked = true;
-				else
-					vBodies[i].bTracked = false;
-
-				vBodies[i].vJointsInColorSpace.resize(JointType_Count);
-
-				for (int j = 0; j < JointType_Count; j++)
-				{
-					ColorSpacePoint tempPoint;
-					pCoordinateMapper->MapCameraPointToColorSpace(joints[j].Position, &tempPoint);
-					vBodies[i].vJointsInColorSpace[j].X = tempPoint.X;
-					vBodies[i].vJointsInColorSpace[j].Y = tempPoint.Y;
-				}
-			}
-		}
-	}
-
-	SafeRelease(pBodyFrame);
-	SafeRelease(pBodyFrameReference);
-}
-
-void Freenect2Capture::GetBodyIndexFrame(IMultiSourceFrame* pMultiFrame)
-{
-	IBodyIndexFrameReference* pBodyIndexFrameReference = NULL;
-	IBodyIndexFrame* pBodyIndexFrame = NULL;
-	pMultiFrame->get_BodyIndexFrameReference(&pBodyIndexFrameReference);
-	HRESULT hr = pBodyIndexFrameReference->AcquireFrame(&pBodyIndexFrame);
-
-
-	if (SUCCEEDED(hr))
-	{
-		if (pBodyIndex == NULL)
-		{
-			pBodyIndex = new BYTE[nDepthFrameHeight * nDepthFrameWidth];
-		}
-
-		UINT nBufferSize = nDepthFrameHeight * nDepthFrameWidth;
-		hr = pBodyIndexFrame->CopyFrameDataToArray(nBufferSize, pBodyIndex);
-	}
-
-	SafeRelease(pBodyIndexFrame);
-	SafeRelease(pBodyIndexFrameReference);
 }

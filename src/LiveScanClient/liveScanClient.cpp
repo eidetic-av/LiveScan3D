@@ -83,9 +83,10 @@ LiveScanClient::LiveScanClient() :
 	calibration.LoadCalibration();
 
 	//// Debug console
-	/*AllocConsole();
+	AllocConsole();
 	freopen("CONOUT$", "w", stdout);
-	freopen("CONOUT$", "w", stderr);*/
+	freopen("CONOUT$", "w", stderr);
+	cout << "Starting LiveScanClient";
 }
 
 LiveScanClient::~LiveScanClient()
@@ -195,6 +196,7 @@ int LiveScanClient::Run(HINSTANCE hInstance, int nCmdShow)
 
 void LiveScanClient::UpdateFrame()
 {
+
 	if (!pCapture->bInitialized)
 	{
 		return;
