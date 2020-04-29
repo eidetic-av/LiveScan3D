@@ -44,6 +44,7 @@
             this.btSettings = new System.Windows.Forms.Button();
             this.refineWorker = new System.ComponentModel.BackgroundWorker();
             this.lbSeqName = new System.Windows.Forms.Label();
+            this.btStartStreaming = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -69,7 +70,7 @@
             // 
             // btRecord
             // 
-            this.btRecord.Location = new System.Drawing.Point(12, 126);
+            this.btRecord.Location = new System.Drawing.Point(123, 154);
             this.btRecord.Name = "btRecord";
             this.btRecord.Size = new System.Drawing.Size(95, 23);
             this.btRecord.TabIndex = 4;
@@ -109,7 +110,7 @@
             // 
             // txtSeqName
             // 
-            this.txtSeqName.Location = new System.Drawing.Point(113, 155);
+            this.txtSeqName.Location = new System.Drawing.Point(224, 157);
             this.txtSeqName.MaxLength = 40;
             this.txtSeqName.Name = "txtSeqName";
             this.txtSeqName.Size = new System.Drawing.Size(106, 20);
@@ -170,11 +171,21 @@
             // lbSeqName
             // 
             this.lbSeqName.AutoSize = true;
-            this.lbSeqName.Location = new System.Drawing.Point(113, 136);
+            this.lbSeqName.Location = new System.Drawing.Point(224, 138);
             this.lbSeqName.Name = "lbSeqName";
             this.lbSeqName.Size = new System.Drawing.Size(88, 13);
             this.lbSeqName.TabIndex = 14;
             this.lbSeqName.Text = "Sequence name:";
+            // 
+            // btStartStreaming
+            // 
+            this.btStartStreaming.Location = new System.Drawing.Point(12, 126);
+            this.btStartStreaming.Name = "btStartStreaming";
+            this.btStartStreaming.Size = new System.Drawing.Size(95, 23);
+            this.btStartStreaming.TabIndex = 12;
+            this.btStartStreaming.Text = "Start streaming";
+            this.btStartStreaming.UseVisualStyleBackColor = true;
+            this.btStartStreaming.Click += new System.EventHandler(this.btStartStreaming_Click);
             // 
             // MainWindowForm
             // 
@@ -183,6 +194,7 @@
             this.ClientSize = new System.Drawing.Size(344, 209);
             this.Controls.Add(this.lbSeqName);
             this.Controls.Add(this.btSettings);
+            this.Controls.Add(this.btStartStreaming);
             this.Controls.Add(this.btShowLive);
             this.Controls.Add(this.btRefineCalib);
             this.Controls.Add(this.txtSeqName);
@@ -221,6 +233,7 @@
         private System.ComponentModel.BackgroundWorker refineWorker;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
         private System.Windows.Forms.Label lbSeqName;
+        private System.Windows.Forms.Button btStartStreaming;
     }
 }
 

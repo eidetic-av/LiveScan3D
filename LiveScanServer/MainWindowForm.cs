@@ -463,10 +463,14 @@ namespace KinectServer
                 updateWorker.RunWorkerAsync();
         }
 
-        private void btShowLive_Click(object sender, EventArgs e)
-        {            
+        private void btStartStreaming_Click(object sender, EventArgs e)
+        {
+            Debug.WriteLine("start streaming");
             RestartUpdateWorker();
+        }
 
+        private void btShowLive_Click(object sender, EventArgs e)
+        {
             //Opens the live view window if it is not open yet.
             if (!OpenGLWorker.IsBusy)
                 OpenGLWorker.RunWorkerAsync();

@@ -8,6 +8,8 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Net;
 
+using System.Diagnostics;
+
 
 namespace KinectServer
 {
@@ -102,6 +104,7 @@ namespace KinectServer
                 {
                     for (int i = 0; i < lClientSockets.Count; i++)
                     {
+                        Debug.WriteLine("Send Frame: " + i);
                         byte[] buffer = lClientSockets[i].Receive(1);
 
                         while (buffer.Length != 0)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -56,7 +57,7 @@ namespace KinectServer
             byte[] buffer = new byte[sizeof(short) * 3 * nVerticesToSend];
             Buffer.BlockCopy(sVertices, 0, buffer, 0, sizeof(short) * 3 * nVerticesToSend);
             try
-            {                 
+            {
                 WriteInt(nVerticesToSend);                               
                 oSocket.GetStream().Write(buffer, 0, buffer.Length);
                 oSocket.GetStream().Write(colors.ToArray(), 0, sizeof(byte) * 3 * nVerticesToSend);
