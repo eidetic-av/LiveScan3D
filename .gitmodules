@@ -1,0 +1,3 @@
+[submodule "Spout.NET"]
+	path = Spout.NET
+	url = https://github.com/Ruminoid/Spout.NET.git

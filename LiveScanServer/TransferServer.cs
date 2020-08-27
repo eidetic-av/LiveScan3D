@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Threading;
-
 using System.Net.Sockets;
 using System.Net;
-
 using System.Diagnostics;
-
+using System;
 
 namespace KinectServer
 {
@@ -18,11 +12,15 @@ namespace KinectServer
         public List<float> lVertices = new List<float>();
         public List<byte> lColors = new List<byte>();
 
+        public bool useSpout = false;
+
         TcpListener oListener;
         List<TransferSocket> lClientSockets = new List<TransferSocket>();
 
         object oClientSocketLock = new object();
         bool bServerRunning = false;
+
+        SpoutManager spoutManager = new SpoutManager();
 
         ~TransferServer()
         {
@@ -102,9 +100,18 @@ namespace KinectServer
             {
                 lock (oClientSocketLock)
                 {
+                    if (useSpout)
+                    {
+                        lock (lVertices)
+                        {
+                            spoutManager.SendFrame(lVertices, lColors);
+                            continue;
+                        }
+                    }
+
                     for (int i = 0; i < lClientSockets.Count; i++)
                     {
-                        Debug.WriteLine("Send Frame: " + i);
+                        Console.WriteLine("Send Frame: " + i);
                         byte[] buffer = lClientSockets[i].Receive(1);
 
                         while (buffer.Length != 0)

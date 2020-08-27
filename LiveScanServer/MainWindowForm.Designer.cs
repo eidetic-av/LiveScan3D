@@ -45,14 +45,16 @@
             this.refineWorker = new System.ComponentModel.BackgroundWorker();
             this.lbSeqName = new System.Windows.Forms.Label();
             this.btStartStreaming = new System.Windows.Forms.Button();
+            this.streamWithSpout = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btStart
             // 
-            this.btStart.Location = new System.Drawing.Point(12, 12);
+            this.btStart.Location = new System.Drawing.Point(28, 27);
+            this.btStart.Margin = new System.Windows.Forms.Padding(7);
             this.btStart.Name = "btStart";
-            this.btStart.Size = new System.Drawing.Size(95, 23);
+            this.btStart.Size = new System.Drawing.Size(222, 51);
             this.btStart.TabIndex = 0;
             this.btStart.Text = "Start server";
             this.btStart.UseVisualStyleBackColor = true;
@@ -60,9 +62,10 @@
             // 
             // btCalibrate
             // 
-            this.btCalibrate.Location = new System.Drawing.Point(12, 70);
+            this.btCalibrate.Location = new System.Drawing.Point(28, 156);
+            this.btCalibrate.Margin = new System.Windows.Forms.Padding(7);
             this.btCalibrate.Name = "btCalibrate";
-            this.btCalibrate.Size = new System.Drawing.Size(95, 23);
+            this.btCalibrate.Size = new System.Drawing.Size(222, 51);
             this.btCalibrate.TabIndex = 2;
             this.btCalibrate.Text = "Calibrate";
             this.btCalibrate.UseVisualStyleBackColor = true;
@@ -70,9 +73,10 @@
             // 
             // btRecord
             // 
-            this.btRecord.Location = new System.Drawing.Point(123, 154);
+            this.btRecord.Location = new System.Drawing.Point(287, 344);
+            this.btRecord.Margin = new System.Windows.Forms.Padding(7);
             this.btRecord.Name = "btRecord";
-            this.btRecord.Size = new System.Drawing.Size(95, 23);
+            this.btRecord.Size = new System.Drawing.Size(222, 51);
             this.btRecord.TabIndex = 4;
             this.btRecord.Text = "Start recording";
             this.btRecord.UseVisualStyleBackColor = true;
@@ -82,25 +86,29 @@
             // 
             this.lClientListBox.FormattingEnabled = true;
             this.lClientListBox.HorizontalScrollbar = true;
-            this.lClientListBox.Location = new System.Drawing.Point(113, 12);
+            this.lClientListBox.ItemHeight = 29;
+            this.lClientListBox.Location = new System.Drawing.Point(264, 27);
+            this.lClientListBox.Margin = new System.Windows.Forms.Padding(7);
             this.lClientListBox.Name = "lClientListBox";
-            this.lClientListBox.Size = new System.Drawing.Size(219, 108);
+            this.lClientListBox.Size = new System.Drawing.Size(506, 236);
             this.lClientListBox.TabIndex = 5;
             // 
             // statusStrip1
             // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(36, 36);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 187);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 444);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(344, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 33, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(803, 22);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // statusLabel
             // 
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(0, 17);
+            this.statusLabel.Size = new System.Drawing.Size(0, 11);
             // 
             // recordingWorker
             // 
@@ -110,18 +118,20 @@
             // 
             // txtSeqName
             // 
-            this.txtSeqName.Location = new System.Drawing.Point(224, 157);
+            this.txtSeqName.Location = new System.Drawing.Point(523, 350);
+            this.txtSeqName.Margin = new System.Windows.Forms.Padding(7);
             this.txtSeqName.MaxLength = 40;
             this.txtSeqName.Name = "txtSeqName";
-            this.txtSeqName.Size = new System.Drawing.Size(106, 20);
+            this.txtSeqName.Size = new System.Drawing.Size(242, 35);
             this.txtSeqName.TabIndex = 7;
             this.txtSeqName.Text = "noname";
             // 
             // btRefineCalib
             // 
-            this.btRefineCalib.Location = new System.Drawing.Point(12, 97);
+            this.btRefineCalib.Location = new System.Drawing.Point(28, 216);
+            this.btRefineCalib.Margin = new System.Windows.Forms.Padding(7);
             this.btRefineCalib.Name = "btRefineCalib";
-            this.btRefineCalib.Size = new System.Drawing.Size(95, 23);
+            this.btRefineCalib.Size = new System.Drawing.Size(222, 51);
             this.btRefineCalib.TabIndex = 11;
             this.btRefineCalib.Text = "Refine calib";
             this.btRefineCalib.UseVisualStyleBackColor = true;
@@ -145,9 +155,10 @@
             // 
             // btShowLive
             // 
-            this.btShowLive.Location = new System.Drawing.Point(12, 154);
+            this.btShowLive.Location = new System.Drawing.Point(28, 344);
+            this.btShowLive.Margin = new System.Windows.Forms.Padding(7);
             this.btShowLive.Name = "btShowLive";
-            this.btShowLive.Size = new System.Drawing.Size(95, 23);
+            this.btShowLive.Size = new System.Drawing.Size(222, 51);
             this.btShowLive.TabIndex = 12;
             this.btShowLive.Text = "Show live";
             this.btShowLive.UseVisualStyleBackColor = true;
@@ -155,9 +166,10 @@
             // 
             // btSettings
             // 
-            this.btSettings.Location = new System.Drawing.Point(12, 41);
+            this.btSettings.Location = new System.Drawing.Point(28, 91);
+            this.btSettings.Margin = new System.Windows.Forms.Padding(7);
             this.btSettings.Name = "btSettings";
-            this.btSettings.Size = new System.Drawing.Size(95, 23);
+            this.btSettings.Size = new System.Drawing.Size(222, 51);
             this.btSettings.TabIndex = 13;
             this.btSettings.Text = "Settings";
             this.btSettings.UseVisualStyleBackColor = true;
@@ -171,27 +183,41 @@
             // lbSeqName
             // 
             this.lbSeqName.AutoSize = true;
-            this.lbSeqName.Location = new System.Drawing.Point(224, 138);
+            this.lbSeqName.Location = new System.Drawing.Point(523, 308);
+            this.lbSeqName.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.lbSeqName.Name = "lbSeqName";
-            this.lbSeqName.Size = new System.Drawing.Size(88, 13);
+            this.lbSeqName.Size = new System.Drawing.Size(195, 29);
             this.lbSeqName.TabIndex = 14;
             this.lbSeqName.Text = "Sequence name:";
             // 
             // btStartStreaming
             // 
-            this.btStartStreaming.Location = new System.Drawing.Point(12, 126);
+            this.btStartStreaming.Location = new System.Drawing.Point(28, 281);
+            this.btStartStreaming.Margin = new System.Windows.Forms.Padding(7);
             this.btStartStreaming.Name = "btStartStreaming";
-            this.btStartStreaming.Size = new System.Drawing.Size(95, 23);
+            this.btStartStreaming.Size = new System.Drawing.Size(222, 51);
             this.btStartStreaming.TabIndex = 12;
             this.btStartStreaming.Text = "Start streaming";
             this.btStartStreaming.UseVisualStyleBackColor = true;
             this.btStartStreaming.Click += new System.EventHandler(this.btStartStreaming_Click);
             // 
+            // streamWithSpout
+            // 
+            this.streamWithSpout.AutoSize = true;
+            this.streamWithSpout.Location = new System.Drawing.Point(264, 291);
+            this.streamWithSpout.Name = "streamWithSpout";
+            this.streamWithSpout.Size = new System.Drawing.Size(240, 33);
+            this.streamWithSpout.TabIndex = 15;
+            this.streamWithSpout.Text = "Stream with Spout";
+            this.streamWithSpout.UseVisualStyleBackColor = true;
+            this.streamWithSpout.CheckedChanged += new System.EventHandler(this.streamWithSpout_CheckedChanged);
+            // 
             // MainWindowForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 29F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(344, 209);
+            this.ClientSize = new System.Drawing.Size(803, 466);
+            this.Controls.Add(this.streamWithSpout);
             this.Controls.Add(this.lbSeqName);
             this.Controls.Add(this.btSettings);
             this.Controls.Add(this.btStartStreaming);
@@ -204,6 +230,7 @@
             this.Controls.Add(this.btCalibrate);
             this.Controls.Add(this.btStart);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(7);
             this.MaximizeBox = false;
             this.Name = "MainWindowForm";
             this.Text = "LiveScanServer";
@@ -234,6 +261,7 @@
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
         private System.Windows.Forms.Label lbSeqName;
         private System.Windows.Forms.Button btStartStreaming;
+        private System.Windows.Forms.CheckBox streamWithSpout;
     }
 }
 

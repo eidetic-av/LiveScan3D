@@ -51,7 +51,6 @@ namespace KinectServer
         public void SendFrame(List<float> vertices, List<byte> colors)
         {
             short[] sVertices = Array.ConvertAll(vertices.ToArray(), x => (short)(x * 1000));
-
             
             int nVerticesToSend = vertices.Count / 3;
             byte[] buffer = new byte[sizeof(short) * 3 * nVerticesToSend];

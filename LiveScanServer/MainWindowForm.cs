@@ -112,6 +112,7 @@ namespace KinectServer
             {
                 oServer.StartServer();
                 oTransferServer.StartServer();
+                RestartUpdateWorker();
                 btStart.Text = "Stop server";
             }
             else
@@ -501,6 +502,11 @@ namespace KinectServer
                 listBoxItems.Add(socketList[i].sSocketState);
 
             lClientListBox.DataSource = listBoxItems;
+        }
+
+        private void streamWithSpout_CheckedChanged(object sender, EventArgs e)
+        {
+            oTransferServer.useSpout = streamWithSpout.Checked;
         }
     }
 }
