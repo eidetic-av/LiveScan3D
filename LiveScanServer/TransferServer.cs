@@ -12,7 +12,8 @@ namespace KinectServer
         public List<float> lVertices = new List<float>();
         public List<byte> lColors = new List<byte>();
 
-        public bool useSpout = false;
+        public bool useSpout = true;
+        public static int spoutTransferThreads = 1;
 
         TcpListener oListener;
         List<TransferSocket> lClientSockets = new List<TransferSocket>();

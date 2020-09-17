@@ -1,29 +1,40 @@
 ﻿using System.Collections.Generic;
 using System;
-using System.IO;
-using System.Threading;
 using OpenGL;
 using Spout.Interop;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace KinectServer
 {
     internal class SpoutManager
     {
-        readonly (uint width, uint height) streamSize = (640, 480);
+        public static SpoutManager Instance;
 
-        IntPtr glContext = IntPtr.Zero;
+        public uint streamWidth = 648;
+        public uint streamHeight = 480;
+
         DeviceContext deviceContext;
+        IntPtr glContext = IntPtr.Zero;
         SpoutSender colorSender;
         SpoutSender vertexSender;
 
-        public SpoutManager()
-        {
-        }
+        byte[] vertexBuffer;
+        byte[] colorBuffer;
 
-        ~SpoutManager()
+        public SpoutManager() => Instance = this;
+
+        ~SpoutManager() => DisposeContext();
+
+        public static void DisposeContext()
         {
-            deviceContext.Dispose();
-            deviceContext = null;
+            if (Instance.deviceContext == null) return;
+            Instance.colorSender.Dispose();
+            Instance.vertexSender.Dispose();
+            Instance.deviceContext.Dispose();
+            Instance.deviceContext = null;
         }
 
         public unsafe void SendFrame(List<float> vertices, List<byte> colors)
@@ -32,75 +43,67 @@ namespace KinectServer
             {
                 deviceContext = DeviceContext.Create();
                 glContext = deviceContext.CreateContext(IntPtr.Zero);
-                deviceContext.MakeCurrent(glContext); // Make this the primary context
-                colorSender = new SpoutSender();
-                colorSender.CreateSender("Colors", streamSize.width, streamSize.height, 0); // Create the sender
+                deviceContext.MakeCurrent(glContext);
                 vertexSender = new SpoutSender();
-                vertexSender.CreateSender("Vertices", streamSize.width, streamSize.height, 0); // Create the sender
-            }
-            int colorCount = colors.Count;
-
-            byte[] colorData = new byte[streamSize.width * streamSize.height * 3];
-            for (int i = 0; i < colorData.Length - 1; i++)
-                colorData[i] = i < colorCount - 1 ? colors[i] : Byte.MinValue;
-
-            fixed (byte* colorDataPtr = colorData) // Get the pointer of the byte array
-            {
-                colorSender.SendImage(
-                    colorDataPtr,
-                    streamSize.width,
-                    streamSize.height,
-                    Gl.RGB,
-                    true, // B Invert
-                    0 // Host FBO
-                    );
+                vertexSender.CreateSender("LiveScanVertices", streamWidth, streamHeight, 0);
+                colorSender = new SpoutSender();
+                colorSender.CreateSender("LiveScanColors", (streamWidth / 3), streamHeight, 0);
+                vertexBuffer = new byte[streamWidth * streamHeight * 4];
+                colorBuffer = new byte[streamWidth * streamHeight];
             }
 
-            int vertexCount = vertices.Count;
-            byte[] vertexData = new byte[streamSize.width * streamSize.height * 3 * sizeof(ushort)];
-
-            int byteNum = 0;
-            for (int i = 0; i < vertexCount - 1; i+=3)
+            lock (deviceContext)
             {
-                var x = vertices[i];
-                var y = vertices[i + 1];
-                var z = vertices[i + 2];
-                // assume min, max values of -10, 10 (metres in space)
-                // convert to mix, max of 0, 1
-                var normalisedX = ((x / 10f) + 1) / 2f;
-                var normalisedY = ((y / 10f) + 1) / 2f;
-                var normalisedZ = ((z / 10f) + 1) / 2f;
-                // convert (and crop) it to a short
-                var shortX = Convert.ToUInt16(normalisedX * ushort.MaxValue);
-                var shortY = Convert.ToUInt16(normalisedY * ushort.MaxValue);
-                var shortZ = Convert.ToUInt16(normalisedZ * ushort.MaxValue);
-                // get the bytes of each
-                var dataX = BitConverter.GetBytes(shortX);
-                var dataY = BitConverter.GetBytes(shortY);
-                var dataZ = BitConverter.GetBytes(shortZ);
-                // pack vertices into shorts split in two.
-                // where (pixel_n % 2 == 0) contains X,Y,Z coarse bits
-                // and (pixel_n % 2 == 1) contains X,Y,Z fine bits
-                vertexData[byteNum] = dataX[0];
-                vertexData[byteNum + 1] = dataY[0];
-                vertexData[byteNum + 2] = dataZ[0];
-                vertexData[byteNum + 3] = dataX[1];
-                vertexData[byteNum + 4] = dataY[1];
-                vertexData[byteNum + 5] = dataZ[1];
-                byteNum += 6;
+                var vertexValueCount = vertices.Count;
+                if (vertexValueCount == 0) return;
 
-            }
+                var colorsCount = colors.Count;
+                var pixelCount = (int)(streamWidth * streamHeight);
+                var nproc = TransferServer.spoutTransferThreads;
 
-            fixed (byte* vertexDataPtr = vertexData)
-            {
-                vertexSender.SendImage(
-                    vertexDataPtr,
-                    streamSize.width,
-                    streamSize.height,
-                    Gl.RGB,
-                    true, //B invert
-                    0 // Host FBO
-                    );
+                Parallel.For(0, nproc, workerId =>
+                {
+                    var max = pixelCount * (workerId + 1) / nproc;
+                    for (int i = pixelCount * workerId / nproc; i < max; i++)
+                    {
+                        // transfer vertices to buffer
+                        // each individual float is passed into a 32-bit color
+                        byte[] vertexData;
+                        if (i < vertexValueCount)
+                            vertexData = BitConverter.GetBytes(vertices[i]);
+                        else vertexData = new byte[] { 0, 0, 0, 0 };
+                        vertexData.CopyTo(vertexBuffer, i * 4);
+
+                        // transfer colors to buffer
+                        if (i < colorsCount)
+                            colorBuffer[i] = colors[i];
+                        else colorBuffer[i] = Byte.MinValue;
+                    }
+                });
+
+                // transfer the buffers to spout
+                fixed (byte* vertexDataPtr = vertexBuffer)
+                {
+                    vertexSender.SendImage(
+                        vertexDataPtr,
+                        streamWidth,
+                        streamHeight,
+                        Gl.RGBA,
+                        false, //B invert
+                        0 // Host FBO
+                        );
+                }
+                fixed (byte* colorDataPtr = colorBuffer)
+                {
+                    colorSender.SendImage(
+                        colorDataPtr,
+                        (streamWidth / 3),
+                        streamHeight,
+                        Gl.RGB,
+                        false, // B Invert
+                        0 // Host FBO
+                        );
+                }
             }
         }
     }

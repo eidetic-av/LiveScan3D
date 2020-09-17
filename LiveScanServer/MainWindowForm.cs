@@ -508,5 +508,35 @@ namespace KinectServer
         {
             oTransferServer.useSpout = streamWithSpout.Checked;
         }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            if (numericUpDown1.Value > Environment.ProcessorCount)
+                numericUpDown1.Value = Environment.ProcessorCount;
+            TransferServer.spoutTransferThreads = (int) numericUpDown1.Value;
+        }
+
+        private void textureWidth_ValueChanged(object sender, EventArgs e)
+        {
+            if (streamWithSpout.Checked == true)
+            {
+                oTransferServer.useSpout = streamWithSpout.Checked = false;
+                System.Threading.Thread.Sleep(100);
+            }
+            SpoutManager.Instance.streamWidth = (uint) textureWidth.Value;
+            SpoutManager.DisposeContext();
+        }
+
+        private void textureHeight_ValueChanged(object sender, EventArgs e)
+        {
+            if (streamWithSpout.Checked == true)
+            {
+                oTransferServer.useSpout = streamWithSpout.Checked = false;
+                System.Threading.Thread.Sleep(100);
+            }
+            oTransferServer.useSpout = streamWithSpout.Checked = false;
+            SpoutManager.Instance.streamHeight = (uint)textureHeight.Value;
+            SpoutManager.DisposeContext();
+        }
     }
 }

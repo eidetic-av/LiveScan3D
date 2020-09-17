@@ -46,7 +46,17 @@
             this.lbSeqName = new System.Windows.Forms.Label();
             this.btStartStreaming = new System.Windows.Forms.Button();
             this.streamWithSpout = new System.Windows.Forms.CheckBox();
+            this.spoutSettingsLabel = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.textureWidth = new System.Windows.Forms.NumericUpDown();
+            this.textureHeight = new System.Windows.Forms.NumericUpDown();
+            this.textureDelim = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textureWidth)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textureHeight)).BeginInit();
             this.SuspendLayout();
             // 
             // btStart
@@ -98,7 +108,7 @@
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(36, 36);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 444);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 663);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 33, 0);
             this.statusStrip1.Size = new System.Drawing.Size(803, 22);
@@ -204,19 +214,133 @@
             // streamWithSpout
             // 
             this.streamWithSpout.AutoSize = true;
-            this.streamWithSpout.Location = new System.Drawing.Point(264, 291);
+            this.streamWithSpout.Checked = true;
+            this.streamWithSpout.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.streamWithSpout.Location = new System.Drawing.Point(28, 494);
             this.streamWithSpout.Name = "streamWithSpout";
-            this.streamWithSpout.Size = new System.Drawing.Size(240, 33);
+            this.streamWithSpout.Size = new System.Drawing.Size(281, 33);
             this.streamWithSpout.TabIndex = 15;
-            this.streamWithSpout.Text = "Stream with Spout";
+            this.streamWithSpout.Text = "Spout stream enabled";
             this.streamWithSpout.UseVisualStyleBackColor = true;
             this.streamWithSpout.CheckedChanged += new System.EventHandler(this.streamWithSpout_CheckedChanged);
+            // 
+            // spoutSettingsLabel
+            // 
+            this.spoutSettingsLabel.AutoSize = true;
+            this.spoutSettingsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.spoutSettingsLabel.Location = new System.Drawing.Point(23, 436);
+            this.spoutSettingsLabel.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
+            this.spoutSettingsLabel.Name = "spoutSettingsLabel";
+            this.spoutSettingsLabel.Size = new System.Drawing.Size(179, 29);
+            this.spoutSettingsLabel.TabIndex = 16;
+            this.spoutSettingsLabel.Text = "Spout settings";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(440, 602);
+            this.label1.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(195, 29);
+            this.label1.TabIndex = 18;
+            this.label1.Text = "Transfer threads:";
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(645, 596);
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(120, 35);
+            this.numericUpDown1.TabIndex = 20;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            // 
+            // textureWidth
+            // 
+            this.textureWidth.Increment = new decimal(new int[] {
+            12,
+            0,
+            0,
+            0});
+            this.textureWidth.Location = new System.Drawing.Point(28, 596);
+            this.textureWidth.Maximum = new decimal(new int[] {
+            4096,
+            0,
+            0,
+            0});
+            this.textureWidth.Minimum = new decimal(new int[] {
+            12,
+            0,
+            0,
+            0});
+            this.textureWidth.Name = "textureWidth";
+            this.textureWidth.Size = new System.Drawing.Size(120, 35);
+            this.textureWidth.TabIndex = 21;
+            this.textureWidth.Value = new decimal(new int[] {
+            648,
+            0,
+            0,
+            0});
+            this.textureWidth.ValueChanged += new System.EventHandler(this.textureWidth_ValueChanged);
+            // 
+            // textureHeight
+            // 
+            this.textureHeight.Location = new System.Drawing.Point(192, 596);
+            this.textureHeight.Maximum = new decimal(new int[] {
+            4096,
+            0,
+            0,
+            0});
+            this.textureHeight.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.textureHeight.Name = "textureHeight";
+            this.textureHeight.Size = new System.Drawing.Size(120, 35);
+            this.textureHeight.TabIndex = 22;
+            this.textureHeight.Value = new decimal(new int[] {
+            480,
+            0,
+            0,
+            0});
+            this.textureHeight.ValueChanged += new System.EventHandler(this.textureHeight_ValueChanged);
+            // 
+            // textureDelim
+            // 
+            this.textureDelim.AutoSize = true;
+            this.textureDelim.Location = new System.Drawing.Point(158, 602);
+            this.textureDelim.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
+            this.textureDelim.Name = "textureDelim";
+            this.textureDelim.Size = new System.Drawing.Size(24, 29);
+            this.textureDelim.TabIndex = 23;
+            this.textureDelim.Text = "x";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(23, 553);
+            this.label2.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(150, 29);
+            this.label2.TabIndex = 24;
+            this.label2.Text = "Texture size:";
             // 
             // MainWindowForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 29F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(803, 466);
+            this.ClientSize = new System.Drawing.Size(803, 685);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.textureDelim);
+            this.Controls.Add(this.textureHeight);
+            this.Controls.Add(this.textureWidth);
+            this.Controls.Add(this.numericUpDown1);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.spoutSettingsLabel);
             this.Controls.Add(this.streamWithSpout);
             this.Controls.Add(this.lbSeqName);
             this.Controls.Add(this.btSettings);
@@ -237,6 +361,9 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textureWidth)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textureHeight)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -262,6 +389,13 @@
         private System.Windows.Forms.Label lbSeqName;
         private System.Windows.Forms.Button btStartStreaming;
         private System.Windows.Forms.CheckBox streamWithSpout;
+        private System.Windows.Forms.Label spoutSettingsLabel;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown textureWidth;
+        private System.Windows.Forms.NumericUpDown textureHeight;
+        private System.Windows.Forms.Label textureDelim;
+        private System.Windows.Forms.Label label2;
     }
 }
 
